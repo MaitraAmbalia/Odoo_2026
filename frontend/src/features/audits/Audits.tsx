@@ -25,8 +25,9 @@ export const Audits: React.FC = () => {
   const { data: departments } = useDepartments();
   const { data: employees } = useEmployees();
 
-  const [selectedCycleId, setSelectedCycleId] = useState<string>('audit-1');
-  const { data: items, isLoading: loadingItems } = useAuditItems(selectedCycleId);
+  const [selectedCycleId, setSelectedCycleId] = useState<string>('');
+  const activeCycleId = selectedCycleId || cycles?.[0]?.id || '';
+  const { data: items, isLoading: loadingItems } = useAuditItems(activeCycleId);
 
   const verifyItemMutation = useVerifyAuditItem();
   const closeCycleMutation = useCloseAuditCycle();
@@ -47,7 +48,7 @@ export const Audits: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
 
-  const activeCycle = cycles?.find(c => c.id === selectedCycleId);
+  const activeCycle = cycles?.find(c => c.id === activeCycleId);
 
   // Check discrepancies (Missing or Damaged items)
   const discrepancies = items?.filter(item => item.result === 'MISSING' || item.result === 'DAMAGED') || [];
@@ -56,13 +57,17 @@ export const Audits: React.FC = () => {
     e.preventDefault();
     if (!cycleName || !startDate || !endDate) return;
 
+    // Ensure at least one auditor is selected
+    const auditorIds = selectedAuditors.length > 0 ? selectedAuditors : employees?.slice(0,1).map(e => e.id) || [];
+
     createCycleMutation.mutate({
       name: cycleName,
-      scopeDepartmentId: scopeDept || undefined,
+      // Don't send 'all' as UUID
+      scopeDepartmentId: (scopeDept && scopeDept !== 'all') ? scopeDept : undefined,
       scopeLocation: scopeLoc || undefined,
       startDate,
       endDate,
-      auditorUserIds: selectedAuditors
+      auditorUserIds: auditorIds
     }, {
       onSuccess: () => {
         toast({ title: 'Success', description: 'New audit cycle launched.' });
@@ -82,7 +87,7 @@ export const Audits: React.FC = () => {
   const submitVerification = () => {
     if (!selectedItemId) return;
     verifyItemMutation.mutate({
-      cycleId: selectedCycleId,
+      cycleId: activeCycleId,
       itemId: selectedItemId,
       result: selectedResult,
       notes
@@ -96,8 +101,8 @@ export const Audits: React.FC = () => {
   };
 
   const handleCloseCycle = () => {
-    if (!selectedCycleId) return;
-    closeCycleMutation.mutate(selectedCycleId, {
+    if (!activeCycleId) return;
+    closeCycleMutation.mutate(activeCycleId, {
       onSuccess: () => {
         toast({ title: 'Success', description: 'Audit cycle locked and closed successfully.' });
       }
@@ -148,7 +153,7 @@ export const Audits: React.FC = () => {
                     key={c.id}
                     onClick={() => setSelectedCycleId(c.id)}
                     className={`w-full text-left p-3 rounded-lg border text-xs transition-colors flex flex-col gap-1 ${
-                      selectedCycleId === c.id
+                      activeCycleId === c.id
                         ? 'bg-primary/10 border-primary text-foreground'
                         : 'bg-background border-border text-muted-foreground hover:text-foreground'
                     }`}
@@ -291,6 +296,7 @@ export const Audits: React.FC = () => {
                   type="date" 
                   value={startDate} 
                   onChange={(e) => setStartDate(e.target.value)} 
+                  min={new Date().toISOString().split('T')[0]}
                   className="bg-background border-border text-xs" 
                   required 
                 />
@@ -302,10 +308,39 @@ export const Audits: React.FC = () => {
                   type="date" 
                   value={endDate} 
                   onChange={(e) => setEndDate(e.target.value)} 
+                  min={startDate || new Date().toISOString().split('T')[0]}
                   className="bg-background border-border text-xs" 
                   required 
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Assign Auditors</Label>
+              <div className="rounded-lg border border-border bg-background p-3 max-h-[140px] overflow-y-auto space-y-1.5">
+                {employees?.length === 0 && (
+                  <p className="text-xs text-muted-foreground">No employees found.</p>
+                )}
+                {employees?.map(emp => (
+                  <label key={emp.id} className="flex items-center gap-2 text-xs text-foreground cursor-pointer hover:text-primary">
+                    <input
+                      type="checkbox"
+                      value={emp.id}
+                      checked={selectedAuditors.includes(emp.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedAuditors(prev => [...prev, emp.id]);
+                        } else {
+                          setSelectedAuditors(prev => prev.filter(id => id !== emp.id));
+                        }
+                      }}
+                      className="accent-primary"
+                    />
+                    {emp.name} <span className="text-muted-foreground font-mono text-[10px]">({emp.role})</span>
+                  </label>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground">Select at least one auditor for this cycle.</p>
             </div>
 
             <DialogFooter className="pt-4">

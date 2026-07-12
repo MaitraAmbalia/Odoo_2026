@@ -6,7 +6,7 @@ export const useBookings = (assetId?: string) => {
     queryKey: ['bookings', assetId],
     queryFn: async () => {
       const res = await apiClient.get('/bookings', { params: { assetId } });
-      return res.data.data;
+      return (res.data.data.items || []) as any[];
     },
     enabled: !!assetId
   });

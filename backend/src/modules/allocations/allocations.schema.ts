@@ -24,7 +24,7 @@ export const CreateAllocationSchema = z.object({
 export const ReturnAllocationSchema = z.object({
   body: z.object({
     returnConditionNotes: z.string().optional(),
-  }),
+  }).default({}),
 });
 
 export const CreateTransferRequestSchema = z.object({
@@ -45,7 +45,7 @@ export const CreateTransferRequestSchema = z.object({
 export const ResolveTransferRequestSchema = z.object({
   body: z.object({
     notes: z.string().optional(),
-  }),
+  }).default({}),
 });
 
 export const AllocationParamsSchema = z.object({

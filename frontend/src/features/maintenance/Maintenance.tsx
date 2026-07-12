@@ -42,9 +42,26 @@ export const Maintenance: React.FC = () => {
   const [technicianName, setTechnicianName] = useState('');
   const [resolutionNotes, setResolutionNotes] = useState('');
 
+  const getErrorMessage = (error: any) => {
+    const data = error?.response?.data;
+    if (data?.message === 'Validation failed' && Array.isArray(data?.errors) && data.errors.length > 0) {
+      return data.errors.map((e: any) => e.message).join(', ');
+    }
+    return data?.message || error?.message || 'An unexpected error occurred';
+  };
+
   const handleCreateRequest = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedAssetId || !issueDescription) return;
+
+    if (issueDescription.trim().length < 5) {
+      toast({
+        title: 'Validation Error',
+        description: 'Issue description must be at least 5 characters.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     createRequestMutation.mutate({
       assetId: selectedAssetId,
@@ -57,6 +74,13 @@ export const Maintenance: React.FC = () => {
         setSelectedAssetId('');
         setIssueDescription('');
         setPriority('MEDIUM');
+      },
+      onError: (err: any) => {
+        toast({
+          title: 'Failed to create request',
+          description: getErrorMessage(err),
+          variant: 'destructive'
+        });
       }
     });
   };
@@ -75,6 +99,13 @@ export const Maintenance: React.FC = () => {
       }, {
         onSuccess: () => {
           toast({ title: 'Success', description: `Request transitioned to ${targetStatus}` });
+        },
+        onError: (err: any) => {
+          toast({
+            title: 'Transition Failed',
+            description: getErrorMessage(err),
+            variant: 'destructive'
+          });
         }
       });
     }
@@ -82,6 +113,15 @@ export const Maintenance: React.FC = () => {
 
   const handleAssignTechnician = () => {
     if (!currentRequest || !technicianName) return;
+
+    if (technicianName.trim().length < 2) {
+      toast({
+        title: 'Validation Error',
+        description: 'Technician name must be at least 2 characters.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     updateStatusMutation.mutate({
       id: currentRequest.id,
@@ -92,12 +132,28 @@ export const Maintenance: React.FC = () => {
         toast({ title: 'Success', description: `Technician ${technicianName} assigned.` });
         setIsAssignOpen(false);
         setTechnicianName('');
+      },
+      onError: (err: any) => {
+        toast({
+          title: 'Assignment Failed',
+          description: getErrorMessage(err),
+          variant: 'destructive'
+        });
       }
     });
   };
 
   const handleResolveRequest = () => {
     if (!currentRequest || !resolutionNotes) return;
+
+    if (resolutionNotes.trim().length < 5) {
+      toast({
+        title: 'Validation Error',
+        description: 'Resolution notes must be at least 5 characters.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     updateStatusMutation.mutate({
       id: currentRequest.id,
@@ -108,6 +164,13 @@ export const Maintenance: React.FC = () => {
         toast({ title: 'Success', description: 'Maintenance issue resolved.' });
         setIsResolveOpen(false);
         setResolutionNotes('');
+      },
+      onError: (err: any) => {
+        toast({
+          title: 'Resolution Failed',
+          description: getErrorMessage(err),
+          variant: 'destructive'
+        });
       }
     });
   };

@@ -14,6 +14,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useRegisterAsset } from '../../hooks/useAssets';
+import { useCategories } from '../../hooks/useOrgSetup';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 
 const assetSchema = z.object({
@@ -40,6 +41,7 @@ export const AssetDrawer: React.FC<AssetDrawerProps> = ({ open, onOpenChange }) 
   });
 
   const registerMutation = useRegisterAsset();
+  const { data: categories } = useCategories();
 
   const onSubmit = (data: any) => {
     const formData = new FormData();
@@ -80,8 +82,9 @@ export const AssetDrawer: React.FC<AssetDrawerProps> = ({ open, onOpenChange }) 
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cat1">Laptops</SelectItem>
-                <SelectItem value="cat2">Monitors</SelectItem>
+                {categories?.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.categoryId && <p className="text-sm text-destructive">{errors.categoryId.message}</p>}
@@ -99,11 +102,9 @@ export const AssetDrawer: React.FC<AssetDrawerProps> = ({ open, onOpenChange }) 
                 <SelectValue placeholder="Select condition" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="NEW">New</SelectItem>
                 <SelectItem value="GOOD">Good</SelectItem>
                 <SelectItem value="FAIR">Fair</SelectItem>
                 <SelectItem value="POOR">Poor</SelectItem>
-                <SelectItem value="DAMAGED">Damaged</SelectItem>
               </SelectContent>
             </Select>
           </div>

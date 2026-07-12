@@ -19,8 +19,10 @@ import {
   useDashboardRecentActivity 
 } from '../../hooks/useDashboard';
 import { cn } from '../../lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 export const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { data: kpis, isLoading: kpisLoading } = useDashboardKPIs();
   const { data: overdue, isLoading: overdueLoading } = useDashboardOverdue();
   const { data: recentActivity, isLoading: activityLoading } = useDashboardRecentActivity();
@@ -146,13 +148,24 @@ export const Dashboard: React.FC = () => {
 
       {/* Donezo Style 3 Action Buttons */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Button className="bg-primary hover:bg-primary/95 text-primary-foreground rounded-full py-5 text-xs font-semibold shadow-md shadow-primary/10 transition-all duration-200">
+        <Button 
+          onClick={() => navigate('/assets', { state: { openRegister: true } })}
+          className="bg-primary hover:bg-primary/95 text-primary-foreground rounded-full py-5 text-xs font-semibold shadow-md shadow-primary/10 transition-all duration-200"
+        >
           <Plus className="w-4.5 h-4.5 mr-1.5" /> + register asset
         </Button>
-        <Button variant="outline" className="border-border text-foreground hover:bg-surface-raised rounded-full py-5 text-xs font-semibold transition-all duration-200">
+        <Button 
+          onClick={() => navigate('/bookings')}
+          variant="outline" 
+          className="border-border text-foreground hover:bg-surface-raised rounded-full py-5 text-xs font-semibold transition-all duration-200"
+        >
           <CalendarDays className="w-4.5 h-4.5 mr-1.5 text-primary" /> Book resource
         </Button>
-        <Button variant="outline" className="border-border text-foreground hover:bg-surface-raised rounded-full py-5 text-xs font-semibold transition-all duration-200">
+        <Button 
+          onClick={() => navigate('/maintenance')}
+          variant="outline" 
+          className="border-border text-foreground hover:bg-surface-raised rounded-full py-5 text-xs font-semibold transition-all duration-200"
+        >
           <Wrench className="w-4.5 h-4.5 mr-1.5 text-primary" /> Raise requests
         </Button>
       </div>

@@ -7,6 +7,7 @@ import { ApiError } from '../../common/ApiError';
 export class AssetsController {
   getAll = asyncHandler(async (req: Request, res: Response) => {
     const result = await assetsService.getAll({
+      search: req.query.search as string | undefined,
       tag: req.query.tag as string | undefined,
       serial: req.query.serial as string | undefined,
       category: req.query.category as string | undefined,
