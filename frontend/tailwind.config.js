@@ -50,6 +50,14 @@ export default {
           DEFAULT: "hsl(var(--surface))",
           foreground: "hsl(var(--foreground))",
         },
+        surface: {
+          DEFAULT: "hsl(var(--surface))",
+          foreground: "hsl(var(--foreground))",
+        },
+        "surface-raised": {
+          DEFAULT: "hsl(var(--surface-raised))",
+          foreground: "hsl(var(--foreground))",
+        },
         warning: {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--primary-foreground))"

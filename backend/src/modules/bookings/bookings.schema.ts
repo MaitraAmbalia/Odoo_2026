@@ -7,7 +7,7 @@ export const CreateBookingSchema = z.object({
     endTime: z.coerce.date(),
     departmentId: z.string().uuid('Invalid departmentId format').optional(),
   }).refine(
-    (data) => data.endTime > data.startTime,
+    (data: any) => data.endTime > data.startTime,
     {
       message: 'endTime must be after startTime',
       path: ['endTime'],
@@ -20,7 +20,7 @@ export const RescheduleBookingSchema = z.object({
     startTime: z.coerce.date(),
     endTime: z.coerce.date(),
   }).refine(
-    (data) => data.endTime > data.startTime,
+    (data: any) => data.endTime > data.startTime,
     {
       message: 'endTime must be after startTime',
       path: ['endTime'],
@@ -31,7 +31,7 @@ export const RescheduleBookingSchema = z.object({
 export const CancelBookingSchema = z.object({
   body: z.object({
     cancelReason: z.string().optional(),
-  }),
+  }).default({}),
 });
 
 export const BookingParamsSchema = z.object({

@@ -42,9 +42,26 @@ export const Maintenance: React.FC = () => {
   const [technicianName, setTechnicianName] = useState('');
   const [resolutionNotes, setResolutionNotes] = useState('');
 
+  const getErrorMessage = (error: any) => {
+    const data = error?.response?.data;
+    if (data?.message === 'Validation failed' && Array.isArray(data?.errors) && data.errors.length > 0) {
+      return data.errors.map((e: any) => e.message).join(', ');
+    }
+    return data?.message || error?.message || 'An unexpected error occurred';
+  };
+
   const handleCreateRequest = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedAssetId || !issueDescription) return;
+
+    if (issueDescription.trim().length < 5) {
+      toast({
+        title: 'Validation Error',
+        description: 'Issue description must be at least 5 characters.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     createRequestMutation.mutate({
       assetId: selectedAssetId,
@@ -57,6 +74,13 @@ export const Maintenance: React.FC = () => {
         setSelectedAssetId('');
         setIssueDescription('');
         setPriority('MEDIUM');
+      },
+      onError: (err: any) => {
+        toast({
+          title: 'Failed to create request',
+          description: getErrorMessage(err),
+          variant: 'destructive'
+        });
       }
     });
   };
@@ -75,6 +99,13 @@ export const Maintenance: React.FC = () => {
       }, {
         onSuccess: () => {
           toast({ title: 'Success', description: `Request transitioned to ${targetStatus}` });
+        },
+        onError: (err: any) => {
+          toast({
+            title: 'Transition Failed',
+            description: getErrorMessage(err),
+            variant: 'destructive'
+          });
         }
       });
     }
@@ -82,6 +113,15 @@ export const Maintenance: React.FC = () => {
 
   const handleAssignTechnician = () => {
     if (!currentRequest || !technicianName) return;
+
+    if (technicianName.trim().length < 2) {
+      toast({
+        title: 'Validation Error',
+        description: 'Technician name must be at least 2 characters.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     updateStatusMutation.mutate({
       id: currentRequest.id,
@@ -92,12 +132,28 @@ export const Maintenance: React.FC = () => {
         toast({ title: 'Success', description: `Technician ${technicianName} assigned.` });
         setIsAssignOpen(false);
         setTechnicianName('');
+      },
+      onError: (err: any) => {
+        toast({
+          title: 'Assignment Failed',
+          description: getErrorMessage(err),
+          variant: 'destructive'
+        });
       }
     });
   };
 
   const handleResolveRequest = () => {
     if (!currentRequest || !resolutionNotes) return;
+
+    if (resolutionNotes.trim().length < 5) {
+      toast({
+        title: 'Validation Error',
+        description: 'Resolution notes must be at least 5 characters.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     updateStatusMutation.mutate({
       id: currentRequest.id,
@@ -108,6 +164,13 @@ export const Maintenance: React.FC = () => {
         toast({ title: 'Success', description: 'Maintenance issue resolved.' });
         setIsResolveOpen(false);
         setResolutionNotes('');
+      },
+      onError: (err: any) => {
+        toast({
+          title: 'Resolution Failed',
+          description: getErrorMessage(err),
+          variant: 'destructive'
+        });
       }
     });
   };
@@ -149,12 +212,12 @@ export const Maintenance: React.FC = () => {
               ) : (
                 requests?.filter(r => r.status === col.id).map((req) => (
                   <div key={req.id} className="p-3 bg-background border border-border rounded-lg space-y-3 hover:border-border/80 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="text-xs font-semibold text-foreground">{req.asset?.name}</div>
-                        <div className="text-[10px] text-muted-foreground font-mono">{req.asset?.assetTag}</div>
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-semibold text-foreground break-words leading-tight">{req.asset?.name}</div>
+                        <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{req.asset?.assetTag}</div>
                       </div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <span className={`w-2 h-2 rounded-full ${getPriorityColor(req.priority)}`} />
                         <span className="text-[9px] font-semibold text-muted-foreground uppercase">{req.priority}</span>
                       </div>
@@ -169,14 +232,14 @@ export const Maintenance: React.FC = () => {
                     )}
 
                     {/* Operational Action buttons depending on state */}
-                    <div className="pt-2 border-t border-border/40 flex justify-between gap-1">
+                    <div className="pt-2 border-t border-border/40 flex justify-between gap-2">
                       {req.status === 'PENDING' && (
                         <>
-                          <Button size="sm" variant="ghost" className="text-destructive h-6 text-[10px] hover:bg-destructive/10" onClick={() => handleStatusChange(req, 'REJECTED')}>
-                            <Ban className="w-3 h-3 mr-1" /> Reject
+                          <Button size="sm" variant="ghost" className="flex-1 text-destructive h-6 text-[10px] px-1 hover:bg-destructive/10" onClick={() => handleStatusChange(req, 'REJECTED')}>
+                            <Ban className="w-3 h-3 mr-1 shrink-0" /> Reject
                           </Button>
-                          <Button size="sm" variant="outline" className="border-border text-foreground h-6 text-[10px]" onClick={() => handleStatusChange(req, 'APPROVED')}>
-                            <ArrowRight className="w-3 h-3 mr-1" /> Approve
+                          <Button size="sm" variant="outline" className="flex-1 border-border text-foreground h-6 text-[10px] px-1" onClick={() => handleStatusChange(req, 'APPROVED')}>
+                            <ArrowRight className="w-3 h-3 mr-1 shrink-0" /> Approve
                           </Button>
                         </>
                       )}
