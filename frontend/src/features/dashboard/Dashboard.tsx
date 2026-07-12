@@ -17,11 +17,9 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { useTheme } from '../../components/shared/ThemeContext';
 import { StatusBadge } from '../../components/shared/StatusBadge';
 
 export const Dashboard: React.FC = () => {
-  const { theme } = useTheme();
 
   // Mock data for dashboard cards matching Today's Overview
   const overviewKPIs = [
