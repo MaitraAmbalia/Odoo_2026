@@ -6,15 +6,17 @@ import notificationRoutes from '../modules/notifications/notifications.routes';
 import allocationRoutes from '../modules/allocations/allocations.routes';
 import transferRoutes from '../modules/allocations/transfers.routes';
 
+import employeesRoutes from '../modules/employees/employees.routes';
+
 const router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/departments', departmentRoutes);
 router.use('/categories', categoriesRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/employees', employeesRoutes);
 
 // Module routes will be mounted here as they are implemented:
-// router.use('/employees',     employeeRoutes);
 // router.use('/assets',        assetRoutes);
 router.use('/allocations',   allocationRoutes);
 router.use('/transfers',     transferRoutes);
