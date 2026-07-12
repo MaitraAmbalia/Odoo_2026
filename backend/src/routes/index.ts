@@ -5,6 +5,8 @@ import categoriesRoutes from '../modules/categories/categories.routes';
 import notificationRoutes from '../modules/notifications/notifications.routes';
 import allocationRoutes from '../modules/allocations/allocations.routes';
 import transferRoutes from '../modules/allocations/transfers.routes';
+import bookingRoutes from '../modules/bookings/bookings.routes';
+import maintenanceRoutes from '../modules/maintenance/maintenance.routes';
 
 import employeesRoutes from '../modules/employees/employees.routes';
 
@@ -20,8 +22,8 @@ router.use('/employees', employeesRoutes);
 // router.use('/assets',        assetRoutes);
 router.use('/allocations',   allocationRoutes);
 router.use('/transfers',     transferRoutes);
-// router.use('/bookings',      bookingRoutes);
-// router.use('/maintenance',   maintenanceRoutes);
+router.use('/bookings',      bookingRoutes);
+router.use('/maintenance',   maintenanceRoutes);
 // router.use('/audits',        auditRoutes);
 // router.use('/activity-logs', activityLogRoutes);
 // router.use('/dashboard',     dashboardRoutes);
