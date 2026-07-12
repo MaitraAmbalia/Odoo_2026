@@ -4,16 +4,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Developer task lists
-**/PERSON-1-TASKS.md
-**/PERSON-2-TASKS.md
-skills.md
-
-# Project description and designs
-**/*.excalidraw
-**/*.pdf
-**/assetflow-backend-architecture.md
-**/assetflow-schema-design.md
 
 # Node modules & builds
 node_modules/
