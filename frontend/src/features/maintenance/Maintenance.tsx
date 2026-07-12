@@ -212,12 +212,12 @@ export const Maintenance: React.FC = () => {
               ) : (
                 requests?.filter(r => r.status === col.id).map((req) => (
                   <div key={req.id} className="p-3 bg-background border border-border rounded-lg space-y-3 hover:border-border/80 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="text-xs font-semibold text-foreground">{req.asset?.name}</div>
-                        <div className="text-[10px] text-muted-foreground font-mono">{req.asset?.assetTag}</div>
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-semibold text-foreground break-words leading-tight">{req.asset?.name}</div>
+                        <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{req.asset?.assetTag}</div>
                       </div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <span className={`w-2 h-2 rounded-full ${getPriorityColor(req.priority)}`} />
                         <span className="text-[9px] font-semibold text-muted-foreground uppercase">{req.priority}</span>
                       </div>
@@ -232,14 +232,14 @@ export const Maintenance: React.FC = () => {
                     )}
 
                     {/* Operational Action buttons depending on state */}
-                    <div className="pt-2 border-t border-border/40 flex justify-between gap-1">
+                    <div className="pt-2 border-t border-border/40 flex justify-between gap-2">
                       {req.status === 'PENDING' && (
                         <>
-                          <Button size="sm" variant="ghost" className="text-destructive h-6 text-[10px] hover:bg-destructive/10" onClick={() => handleStatusChange(req, 'REJECTED')}>
-                            <Ban className="w-3 h-3 mr-1" /> Reject
+                          <Button size="sm" variant="ghost" className="flex-1 text-destructive h-6 text-[10px] px-1 hover:bg-destructive/10" onClick={() => handleStatusChange(req, 'REJECTED')}>
+                            <Ban className="w-3 h-3 mr-1 shrink-0" /> Reject
                           </Button>
-                          <Button size="sm" variant="outline" className="border-border text-foreground h-6 text-[10px]" onClick={() => handleStatusChange(req, 'APPROVED')}>
-                            <ArrowRight className="w-3 h-3 mr-1" /> Approve
+                          <Button size="sm" variant="outline" className="flex-1 border-border text-foreground h-6 text-[10px] px-1" onClick={() => handleStatusChange(req, 'APPROVED')}>
+                            <ArrowRight className="w-3 h-3 mr-1 shrink-0" /> Approve
                           </Button>
                         </>
                       )}

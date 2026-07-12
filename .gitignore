@@ -3,7 +3,8 @@
 Thumbs.db
 .vscode/
 .idea/
-
+*.swp
+*.swo
 
 # Node modules & builds
 node_modules/
@@ -12,3 +13,21 @@ dist/
 **/dist/
 package-lock.json
 **/package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Uploads
+uploads/
+**/uploads/
+
+# Prisma
+**/prisma/generated/

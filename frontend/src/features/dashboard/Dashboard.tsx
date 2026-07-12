@@ -1,11 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
-import { 
-  Package, 
-  ArrowRightLeft, 
-  CalendarDays, 
-  Wrench, 
+import {
+  Package,
+  ArrowRightLeft,
+  CalendarDays,
+  Wrench,
   AlertTriangle,
   ArrowUpRight,
   Plus,
@@ -13,10 +13,10 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { StatusBadge } from '../../components/shared/StatusBadge';
-import { 
-  useDashboardKPIs, 
-  useDashboardOverdue, 
-  useDashboardRecentActivity 
+import {
+  useDashboardKPIs,
+  useDashboardOverdue,
+  useDashboardRecentActivity
 } from '../../hooks/useDashboard';
 import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -35,6 +35,35 @@ export const Dashboard: React.FC = () => {
     const hrs = Math.floor(mins / 60);
     if (hrs < 24) return `${hrs}h ago`;
     return new Date(dateStr).toLocaleDateString();
+  };
+
+  const formatLogDetails = (log: any) => {
+    if (log.details) return log.details;
+
+    const meta = log.metadata || {};
+    const tagSuffix = meta.assetTag ? ` (${meta.assetTag})` : '';
+
+    switch (log.action) {
+      case 'ASSET_REGISTERED':
+        return `Asset "${meta.name || 'Unknown'}"${tagSuffix} was registered`;
+      case 'PROMOTE_EMPLOYEE':
+        return `Employee "${meta.employeeName || 'Unknown'}" role updated to ${meta.newRole || ''}`;
+      case 'ASSET_ALLOCATED':
+        return `Asset "${meta.assetName || 'Unknown'}"${tagSuffix} was allocated to ${meta.assigneeName || 'employee'}`;
+      case 'ASSET_RETURNED':
+        return `Asset "${meta.assetName || 'Unknown'}"${tagSuffix} was returned successfully`;
+      case 'MAINTENANCE_REQUESTED':
+        return `Maintenance requested for "${meta.assetName || 'Unknown'}": ${meta.issue || 'issue reported'}`;
+      case 'MAINTENANCE_ASSIGNED':
+        return `Technician "${meta.technician || 'Unknown'}" was assigned to repair "${meta.assetName || 'Unknown'}"`;
+      case 'MAINTENANCE_RESOLVED':
+        return `Maintenance resolved for "${meta.assetName || 'Unknown'}": ${meta.notes || 'fixed'}`;
+      case 'BOOKING_CREATED':
+        return `Resource "${meta.assetName || 'Unknown'}" was booked successfully`;
+      default:
+        const humanizedAction = log.action ? log.action.toLowerCase().replace(/_/g, ' ') : 'performed action';
+        return `${log.entityType || 'Entity'} ${humanizedAction}`;
+    }
   };
 
   const overviewKPIs = [
@@ -98,12 +127,12 @@ export const Dashboard: React.FC = () => {
           overviewKPIs.map((kpi, idx) => {
             const isPrimary = kpi.type === 'primary';
             return (
-              <Card 
-                key={idx} 
+              <Card
+                key={idx}
                 className={cn(
                   "rounded-2xl p-6 transition-all duration-200 border shadow-sm relative overflow-hidden",
-                  isPrimary 
-                    ? "bg-primary text-primary-foreground border-transparent shadow-lg shadow-primary/10" 
+                  isPrimary
+                    ? "bg-gradient-to-br from-[#0e623b] to-[#1b7a4d] dark:from-[#159c5e] dark:to-[#0e623b] text-white border-transparent shadow-lg shadow-primary/10"
                     : "bg-surface border-border text-foreground hover:border-border/80"
                 )}
               >
@@ -119,7 +148,7 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <div className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center text-xs",
-                    isPrimary ? "bg-white/10 text-primary-foreground" : "bg-surface-raised text-muted-foreground"
+                    isPrimary ? "bg-white/20 text-white" : "bg-surface-raised text-muted-foreground"
                   )}>
                     <ArrowUpRight className="w-4 h-4" />
                   </div>
@@ -148,22 +177,22 @@ export const Dashboard: React.FC = () => {
 
       {/* Donezo Style 3 Action Buttons */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Button 
+        <Button
           onClick={() => navigate('/assets', { state: { openRegister: true } })}
           className="bg-primary hover:bg-primary/95 text-primary-foreground rounded-full py-5 text-xs font-semibold shadow-md shadow-primary/10 transition-all duration-200"
         >
           <Plus className="w-4.5 h-4.5 mr-1.5" /> + register asset
         </Button>
-        <Button 
+        <Button
           onClick={() => navigate('/bookings')}
-          variant="outline" 
+          variant="outline"
           className="border-border text-foreground hover:bg-surface-raised rounded-full py-5 text-xs font-semibold transition-all duration-200"
         >
           <CalendarDays className="w-4.5 h-4.5 mr-1.5 text-primary" /> Book resource
         </Button>
-        <Button 
+        <Button
           onClick={() => navigate('/maintenance')}
-          variant="outline" 
+          variant="outline"
           className="border-border text-foreground hover:bg-surface-raised rounded-full py-5 text-xs font-semibold transition-all duration-200"
         >
           <Wrench className="w-4.5 h-4.5 mr-1.5 text-primary" /> Raise requests
@@ -186,7 +215,7 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs font-medium text-foreground leading-normal">
-                      {log.details}
+                      {formatLogDetails(log)}
                     </p>
                     <span className="text-[10px] text-muted-foreground block">
                       {timeAgo(log.createdAt)} • by {log.user?.name || 'System'}

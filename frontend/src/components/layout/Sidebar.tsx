@@ -9,11 +9,14 @@ import {
   Wrench, 
   ClipboardCheck, 
   BarChart3, 
-  Bell 
+  Bell,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { RoleGate } from './RoleGate';
 import { cn } from '../../lib/utils';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useTheme } from '../../hooks/useTheme';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -29,6 +32,7 @@ const navItems = [
 
 export const Sidebar: React.FC = () => {
   const role = useAuthStore(state => state.role);
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-60 bg-surface border-r border-border flex flex-col z-20">
@@ -54,7 +58,7 @@ export const Sidebar: React.FC = () => {
                 cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-primary/15 text-primary border border-primary/40"
+                    ? "bg-primary/10 text-primary border border-primary/20 font-semibold"
                     : "text-muted-foreground hover:text-foreground hover:bg-surface-raised border border-transparent"
                 )
               }
@@ -69,7 +73,23 @@ export const Sidebar: React.FC = () => {
         })}
       </nav>
       
-      <div className="p-4 border-t border-border">
+      <div className="p-4 border-t border-border space-y-2">
+        <button
+          onClick={toggleTheme}
+          className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-surface-raised rounded-md transition-colors"
+        >
+          {theme === 'dark' ? (
+            <>
+              <Sun className="w-5 h-5 text-amber-500" />
+              <span>Light Mode</span>
+            </>
+          ) : (
+            <>
+              <Moon className="w-5 h-5 text-primary" />
+              <span>Dark Mode</span>
+            </>
+          )}
+        </button>
         <button 
           onClick={() => useAuthStore.getState().logout()}
           className="w-full text-left px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-surface-raised rounded-md transition-colors"

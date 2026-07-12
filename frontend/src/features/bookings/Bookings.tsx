@@ -223,7 +223,7 @@ export const Bookings: React.FC = () => {
                 <span>Calendar — {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
                 <div className="flex items-center gap-1">
                   <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => navigateDate(-1)}><ChevronLeft className="w-4 h-4" /></Button>
-                  <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="bg-background border-border text-xs h-7 w-[130px]" />
+                  <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="bg-background border-border text-xs h-7 w-[150px] px-2" />
                   <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => navigateDate(1)}><ChevronRight className="w-4 h-4" /></Button>
                   {!isToday && <Button variant="outline" size="sm" className="h-7 text-xs border-border" onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}>Today</Button>}
                 </div>
@@ -257,10 +257,10 @@ export const Bookings: React.FC = () => {
                       top: getPositionStyles(b.startTime),
                       height: getHeightStyles(b.startTime, b.endTime)
                     }}
-                    className="absolute left-4 right-4 rounded-lg bg-info/20 border border-info text-info-foreground p-3 flex flex-col justify-between text-xs z-10 hover:bg-info/25 transition-colors"
+                    className="absolute left-4 right-4 rounded-lg bg-info/10 border border-info/30 text-info p-2.5 flex flex-col justify-between text-xs z-10 hover:bg-info/15 transition-colors"
                   >
                     <div className="font-semibold">{b.bookedBy?.name}</div>
-                    <div className="text-[10px] text-muted-foreground">
+                    <div className="text-[10px] opacity-80 mt-0.5">
                       {new Date(b.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(b.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
