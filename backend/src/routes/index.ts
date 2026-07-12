@@ -1,14 +1,17 @@
 import { Router } from 'express';
 import authRoutes from '../modules/auth/auth.routes';
+import departmentRoutes from '../modules/departments/departments.routes';
+import categoriesRoutes from '../modules/categories/categories.routes';
 import notificationRoutes from '../modules/notifications/notifications.routes';
 
 const router = Router();
 
 router.use('/auth', authRoutes);
+router.use('/departments', departmentRoutes);
+router.use('/categories', categoriesRoutes);
+router.use('/notifications', notificationRoutes);
 
 // Module routes will be mounted here as they are implemented:
-// router.use('/departments',   departmentRoutes);
-// router.use('/categories',    categoryRoutes);
 // router.use('/employees',     employeeRoutes);
 // router.use('/assets',        assetRoutes);
 // router.use('/allocations',   allocationRoutes);
@@ -16,7 +19,6 @@ router.use('/auth', authRoutes);
 // router.use('/bookings',      bookingRoutes);
 // router.use('/maintenance',   maintenanceRoutes);
 // router.use('/audits',        auditRoutes);
-router.use('/notifications', notificationRoutes);
 // router.use('/activity-logs', activityLogRoutes);
 // router.use('/dashboard',     dashboardRoutes);
 // router.use('/reports',       reportRoutes);
