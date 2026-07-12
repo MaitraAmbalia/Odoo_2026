@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import authRoutes from '../modules/auth/auth.routes';
+import notificationRoutes from '../modules/notifications/notifications.routes';
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.use('/auth', authRoutes);
 // router.use('/bookings',      bookingRoutes);
 // router.use('/maintenance',   maintenanceRoutes);
 // router.use('/audits',        auditRoutes);
-// router.use('/notifications', notificationRoutes);
+router.use('/notifications', notificationRoutes);
 // router.use('/activity-logs', activityLogRoutes);
 // router.use('/dashboard',     dashboardRoutes);
 // router.use('/reports',       reportRoutes);
