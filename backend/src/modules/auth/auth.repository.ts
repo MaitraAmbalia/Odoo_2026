@@ -36,7 +36,30 @@ export class AuthRepository {
   async updatePassword(userId: string, passwordHash: string) {
     return prisma.user.update({
       where: { id: userId },
-      data: { passwordHash },
+      data: {
+        passwordHash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
+    });
+  }
+
+  async saveResetToken(userId: string, tokenHash: string | null, expiresAt: Date | null) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        resetPasswordToken: tokenHash,
+        resetPasswordExpires: expiresAt,
+      },
+    });
+  }
+
+  async findUserByResetToken(tokenHash: string) {
+    return prisma.user.findFirst({
+      where: {
+        resetPasswordToken: tokenHash,
+        resetPasswordExpires: { gt: new Date() },
+      },
     });
   }
 
