@@ -290,7 +290,7 @@ export const Allocations: React.FC = () => {
                   <TableBody>
                     {loadingAllocs ? (
                       <TableRow><TableCell colSpan={5} className="text-center py-4 text-muted-foreground">Loading...</TableCell></TableRow>
-                    ) : allocations?.map((alloc) => (
+                    ) : allocations?.map((alloc: any) => (
                       <TableRow key={alloc.id} className="border-border">
                         <TableCell>
                           <div className="font-medium text-foreground">{alloc.asset?.name}</div>
@@ -342,7 +342,7 @@ export const Allocations: React.FC = () => {
                   <TableBody>
                     {loadingTransfers ? (
                       <TableRow><TableCell colSpan={5} className="text-center py-4 text-muted-foreground">Loading...</TableCell></TableRow>
-                    ) : transfers?.map((t) => (
+                    ) : transfers?.map((t: any) => (
                       <TableRow key={t.id} className="border-border">
                         <TableCell>
                           <div className="font-medium text-foreground">{t.asset?.name}</div>

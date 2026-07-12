@@ -17,31 +17,37 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+import { apiClient } from '../../api/client';
+
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const login = useAuthStore(state => state.login);
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema)
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    // TODO: Connect to real API
-    console.log('Login attempt:', data);
-    
-    // Mock successful login
-    setTimeout(() => {
-      login('mock-jwt-token', {
-        id: '1',
-        name: 'Demo User',
+    setErrorMsg(null);
+    try {
+      const response = await apiClient.post('/auth/login', {
         email: data.email,
-        role: 'ADMIN',
-        status: 'ACTIVE',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        password: data.password,
       });
-      navigate('/');
-    }, 1000);
+      const responseData = response.data;
+      if (responseData && responseData.data) {
+        const { accessToken, user } = responseData.data;
+        login(accessToken, user);
+        navigate('/');
+      } else {
+        setErrorMsg('Invalid response from server.');
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      const errMsg = err.response?.data?.message || err.message || 'Failed to sign in. Please try again.';
+      setErrorMsg(errMsg);
+    }
   };
 
   return (
@@ -82,6 +88,12 @@ export const Login: React.FC = () => {
               />
               {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
             </div>
+
+            {errorMsg && (
+              <div className="p-3 text-xs bg-destructive/15 text-destructive rounded-lg border border-destructive/20 font-medium text-center">
+                {errorMsg}
+              </div>
+            )}
 
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSubmitting}>
               {isSubmitting ? 'Signing in...' : 'Sign In'}
