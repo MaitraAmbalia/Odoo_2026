@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { 
@@ -8,11 +8,7 @@ import {
   Wrench, 
   AlertTriangle,
   ArrowUpRight,
-  Play,
-  Pause,
-  Square,
   Plus,
-  Clock,
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
@@ -28,29 +24,6 @@ export const Dashboard: React.FC = () => {
   const { data: kpis, isLoading: kpisLoading } = useDashboardKPIs();
   const { data: overdue, isLoading: overdueLoading } = useDashboardOverdue();
   const { data: recentActivity, isLoading: activityLoading } = useDashboardRecentActivity();
-
-  // Time tracker state for Donezo stopwatch widget
-  const [time, setTime] = useState(5048); // Start at 01:24:08 (in seconds)
-  const [isRunning, setIsRunning] = useState(false);
-
-  useEffect(() => {
-    let interval: any = null;
-    if (isRunning) {
-      interval = setInterval(() => {
-        setTime(prev => prev + 1);
-      }, 1000);
-    } else {
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
-  }, [isRunning]);
-
-  const formatTime = (totalSeconds: number) => {
-    const hrs = Math.floor(totalSeconds / 3600);
-    const mins = Math.floor((totalSeconds % 3600) / 60);
-    const secs = totalSeconds % 60;
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
@@ -184,72 +157,35 @@ export const Dashboard: React.FC = () => {
         </Button>
       </div>
 
-      {/* Bottom Row: Recent Activity & Time Tracker */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
-        {/* Left Column: Recent Activity list */}
-        <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-lg font-bold tracking-tight text-foreground">Recent Activity</h2>
-          <Card className="bg-surface border-border rounded-2xl p-6 shadow-sm divide-y divide-border/60">
-            {activityLoading ? (
-              <div className="text-xs text-muted-foreground py-4 text-center">Loading activity feed...</div>
-            ) : recentActivity && recentActivity.length > 0 ? (
-              recentActivity.slice(0, 5).map((log: any) => {
-                const badge = getActivityIcon(log.action);
-                return (
-                  <div key={log.id} className="py-4.5 first:pt-0 last:pb-0 flex items-start gap-3.5">
-                    <div className={cn("w-8 h-8 rounded-full flex items-center justify-center mt-0.5", badge.bg)}>
-                      {badge.icon}
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs font-medium text-foreground leading-normal">
-                        {log.details}
-                      </p>
-                      <span className="text-[10px] text-muted-foreground block">
-                        {timeAgo(log.createdAt)} • by {log.user?.name || 'System'}
-                      </span>
-                    </div>
+      {/* Bottom Row: Recent Activity */}
+      <div className="space-y-4 pt-2">
+        <h2 className="text-lg font-bold tracking-tight text-foreground">Recent Activity</h2>
+        <Card className="bg-surface border-border rounded-2xl p-6 shadow-sm divide-y divide-border/60">
+          {activityLoading ? (
+            <div className="text-xs text-muted-foreground py-4 text-center">Loading activity feed...</div>
+          ) : recentActivity && recentActivity.length > 0 ? (
+            recentActivity.slice(0, 5).map((log: any) => {
+              const badge = getActivityIcon(log.action);
+              return (
+                <div key={log.id} className="py-4.5 first:pt-0 last:pb-0 flex items-start gap-3.5">
+                  <div className={cn("w-8 h-8 rounded-full flex items-center justify-center mt-0.5", badge.bg)}>
+                    {badge.icon}
                   </div>
-                );
-              })
-            ) : (
-              <div className="text-xs text-muted-foreground py-6 text-center">No recent activities logged.</div>
-            )}
-          </Card>
-        </div>
-
-        {/* Right Column: Time Tracker (Stopwatch) */}
-        <div className="lg:col-span-1 space-y-4">
-          <h2 className="text-lg font-bold tracking-tight text-foreground">Time Tracker</h2>
-          <Card className="bg-[#0b1712] border border-primary/20 rounded-2xl p-6 shadow-sm text-white flex flex-col justify-between min-h-[220px]">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-semibold text-primary-foreground/80 tracking-wide uppercase">Active Task Timer</span>
-              <Clock className="w-4 h-4 text-primary" />
-            </div>
-            
-            <div className="text-center my-4">
-              <span className="text-4xl font-mono font-bold tracking-wider text-primary-foreground">
-                {formatTime(time)}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-center gap-4">
-              <Button 
-                size="icon" 
-                onClick={() => setIsRunning(!isRunning)}
-                className="w-10 h-10 rounded-full bg-white text-black hover:bg-white/90 flex items-center justify-center shadow-lg"
-              >
-                {isRunning ? <Pause className="w-4.5 h-4.5" /> : <Play className="w-4.5 h-4.5 ml-0.5" />}
-              </Button>
-              <Button 
-                size="icon" 
-                onClick={() => { setIsRunning(false); setTime(0); }}
-                className="w-10 h-10 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 flex items-center justify-center shadow-lg"
-              >
-                <Square className="w-4.5 h-4.5" />
-              </Button>
-            </div>
-          </Card>
-        </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-foreground leading-normal">
+                      {log.details}
+                    </p>
+                    <span className="text-[10px] text-muted-foreground block">
+                      {timeAgo(log.createdAt)} • by {log.user?.name || 'System'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="text-xs text-muted-foreground py-6 text-center">No recent activities logged.</div>
+          )}
+        </Card>
       </div>
     </div>
   );
