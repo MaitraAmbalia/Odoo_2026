@@ -297,6 +297,7 @@ Open **[http://localhost:5173](http://localhost:5173)** and sign in with any dem
 | **Real-time** | Socket.io | 4.x |
 | **File Upload** | Multer | 2.x |
 | **Validation** | Zod | 4.x |
+| **QR Codes** | qrcode | 1.x |
 | **Logging** | Pino | 10.x |
 | **Cron Jobs** | node-cron | 4.x |
 
