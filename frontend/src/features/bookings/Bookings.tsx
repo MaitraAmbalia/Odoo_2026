@@ -9,17 +9,17 @@ import { Alert, AlertDescription, AlertTitle } from '../../components/ui/alert';
 import { useToast } from '../../hooks/use-toast';
 import { useAssets } from '../../hooks/useAssets';
 import { useBookings, useCreateBooking, useCancelBooking } from '../../hooks/useBookings';
-import { CalendarDays, AlertTriangle, Clock, Plus, Trash2 } from 'lucide-react';
+import { CalendarDays, AlertTriangle, Clock, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StatusBadge } from '../../components/shared/StatusBadge';
 
 export const Bookings: React.FC = () => {
   const { toast } = useToast();
   const { data: assets } = useAssets({});
   
-  // Filter bookable assets
   const bookableAssets = assets?.items.filter(a => a.isBookable) || [];
   
   const [selectedAssetId, setSelectedAssetId] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
     if (bookableAssets.length > 0 && !selectedAssetId) {
@@ -31,28 +31,31 @@ export const Bookings: React.FC = () => {
   const createBookingMutation = useCreateBooking();
   const cancelBookingMutation = useCancelBooking();
 
-  // Booking dialog states
   const [isOpen, setIsOpen] = useState(false);
   const [startTime, setStartTime] = useState('09:30');
   const [endTime, setEndTime] = useState('10:30');
   const [purpose, setPurpose] = useState('');
 
-  // Conflict overlay helper state
   const [conflictOverlay, setConflictOverlay] = useState<{
     start: string;
     end: string;
     msg: string;
   } | null>(null);
 
+  // Date navigation helpers
+  const navigateDate = (days: number) => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + days);
+    setSelectedDate(d.toISOString().split('T')[0]);
+  };
+  const isToday = selectedDate === new Date().toISOString().split('T')[0];
+
   const handleBook = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedAssetId) return;
-
     setConflictOverlay(null);
-
-    const todayStr = new Date().toISOString().split('T')[0];
-    const fullStart = `${todayStr}T${startTime}:00`;
-    const fullEnd = `${todayStr}T${endTime}:00`;
+    const fullStart = `${selectedDate}T${startTime}:00`;
+    const fullEnd = `${selectedDate}T${endTime}:00`;
 
     createBookingMutation.mutate({
       assetId: selectedAssetId,
@@ -141,7 +144,13 @@ export const Bookings: React.FC = () => {
     return `${Math.max(5, Math.min(100, percentage))}%`;
   };
 
-  const activeBookings = bookings?.filter((b: any) => b.status !== 'CANCELLED') || [];
+
+  // Filter bookings for selected date
+  const allActiveBookings = bookings?.filter((b: any) => b.status !== 'CANCELLED') || [];
+  const activeBookings = allActiveBookings.filter((b: any) => {
+    const bookingDate = new Date(b.startTime).toISOString().split('T')[0];
+    return bookingDate === selectedDate;
+  });
 
   return (
     <div className="space-y-6">
@@ -210,8 +219,16 @@ export const Bookings: React.FC = () => {
         <div className="lg:col-span-3">
           <Card className="bg-surface border-border h-[650px] flex flex-col">
             <CardHeader className="pb-3">
-              <CardTitle className="text-foreground text-base">Daily Schedule (8:00 AM — 8:00 PM)</CardTitle>
-              <CardDescription className="text-muted-foreground">Displays confirmed bookings and active conflict overlays.</CardDescription>
+              <CardTitle className="text-foreground text-base flex flex-wrap items-center justify-between gap-2">
+                <span>Calendar — {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => navigateDate(-1)}><ChevronLeft className="w-4 h-4" /></Button>
+                  <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="bg-background border-border text-xs h-7 w-[130px]" />
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => navigateDate(1)}><ChevronRight className="w-4 h-4" /></Button>
+                  {!isToday && <Button variant="outline" size="sm" className="h-7 text-xs border-border" onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}>Today</Button>}
+                </div>
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">8:00 AM — 8:00 PM. Blue = confirmed. Red dashed = conflict.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 relative flex">
               {/* Hour Grid Markers on the left */}

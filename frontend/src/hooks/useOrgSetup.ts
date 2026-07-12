@@ -19,9 +19,29 @@ export const useCreateDepartment = () => {
       const res = await apiClient.post('/departments', data);
       return res.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['departments'] });
-    }
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['departments'] }); }
+  });
+};
+
+export const useUpdateDepartment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...data }: { id: string; name?: string; parentDepartmentId?: string | null; headUserId?: string | null }) => {
+      const res = await apiClient.patch(`/departments/${id}`, data);
+      return res.data;
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['departments'] }); }
+  });
+};
+
+export const useUpdateDepartmentStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: 'ACTIVE' | 'INACTIVE' }) => {
+      const res = await apiClient.patch(`/departments/${id}/status`, { status });
+      return res.data;
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['departments'] }); }
   });
 };
 
@@ -42,9 +62,29 @@ export const useCreateCategory = () => {
       const res = await apiClient.post('/categories', data);
       return res.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-    }
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['categories'] }); }
+  });
+};
+
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...data }: { id: string; name?: string; description?: string; customFieldsSchema?: any }) => {
+      const res = await apiClient.patch(`/categories/${id}`, data);
+      return res.data;
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['categories'] }); }
+  });
+};
+
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`/categories/${id}`);
+      return res.data;
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['categories'] }); }
   });
 };
 
@@ -61,12 +101,21 @@ export const useEmployees = () => {
 export const usePromoteEmployee = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ employeeId, role }: { employeeId: string; role: 'DEPARTMENT_HEAD' | 'ASSET_MANAGER' }) => {
+    mutationFn: async ({ employeeId, role }: { employeeId: string; role: 'DEPARTMENT_HEAD' | 'ASSET_MANAGER' | 'EMPLOYEE' }) => {
       const res = await apiClient.patch(`/employees/${employeeId}/promote`, { role });
       return res.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['employees'] });
-    }
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['employees'] }); }
+  });
+};
+
+export const useUpdateEmployeeStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ employeeId, status }: { employeeId: string; status: 'ACTIVE' | 'INACTIVE' }) => {
+      const res = await apiClient.patch(`/employees/${employeeId}`, { status });
+      return res.data;
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['employees'] }); }
   });
 };
