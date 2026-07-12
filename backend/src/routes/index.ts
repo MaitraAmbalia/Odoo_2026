@@ -11,6 +11,10 @@ import assetsRoutes from '../modules/assets/assets.routes';
 import auditsRoutes from '../modules/audits/audits.routes';
 import reportRoutes from '../modules/reports/reports.routes';
 
+import activityLogRoutes from '../modules/activity-logs/activity-logs.routes';
+
+import dashboardRoutes from '../modules/dashboard/dashboard.routes';
+
 import employeesRoutes from '../modules/employees/employees.routes';
 
 const router = Router();
@@ -28,8 +32,8 @@ router.use('/transfers',     transferRoutes);
 router.use('/bookings',      bookingRoutes);
 router.use('/maintenance',   maintenanceRoutes);
 router.use('/audits',        auditsRoutes);
-// router.use('/activity-logs', activityLogRoutes);
-// router.use('/dashboard',     dashboardRoutes);
+router.use('/activity-logs', activityLogRoutes);
+router.use('/dashboard',     dashboardRoutes);
 router.use('/reports',       reportRoutes);
 
 // Health check
