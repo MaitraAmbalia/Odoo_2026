@@ -5,13 +5,13 @@ export const CreateAllocationSchema = z.object({
     assetId: z.string().uuid('Invalid assetId format'),
     allocatedToUserId: z.string().uuid('Invalid allocatedToUserId format').optional(),
     allocatedToDepartmentId: z.string().uuid('Invalid allocatedToDepartmentId format').optional(),
-    expectedReturnDate: z.preprocess((val) => {
+    expectedReturnDate: z.preprocess((val: any) => {
       if (typeof val === 'string' && val.trim() === '') return undefined;
       return val;
     }, z.coerce.date().optional()),
     conditionNoteOut: z.string().optional(),
   }).refine(
-    (data) =>
+    (data: any) =>
       (!!data.allocatedToUserId && !data.allocatedToDepartmentId) ||
       (!data.allocatedToUserId && !!data.allocatedToDepartmentId),
     {
@@ -32,7 +32,7 @@ export const CreateTransferRequestSchema = z.object({
     requestedToUserId: z.string().uuid('Invalid requestedToUserId format').optional(),
     requestedToDepartmentId: z.string().uuid('Invalid requestedToDepartmentId format').optional(),
   }).refine(
-    (data) =>
+    (data: any) =>
       (!!data.requestedToUserId && !data.requestedToDepartmentId) ||
       (!data.requestedToUserId && !!data.requestedToDepartmentId),
     {
