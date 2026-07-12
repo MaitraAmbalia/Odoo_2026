@@ -112,6 +112,10 @@ export class AuthService {
     }
 
     const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour duration
+
+    await authRepository.saveResetToken(user.id, tokenHash, expiresAt);
     console.log(`\n🔑 Password reset token for ${email}: ${resetToken}\n`);
 
     return {
@@ -121,7 +125,15 @@ export class AuthService {
   }
 
   async resetPassword(token: string, newPassword: string) {
-    throw new ApiError(501, 'Password reset via token is a stub — use forgot-password to get a token, then manually update via admin for now.');
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await authRepository.findUserByResetToken(tokenHash);
+
+    if (!user) {
+      throw new ApiError(400, 'Invalid or expired password reset token');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    await authRepository.updatePassword(user.id, passwordHash);
   }
 
   private generateAccessToken(user: { id: string; role: string; departmentId: string | null }) {
