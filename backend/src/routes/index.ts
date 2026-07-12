@@ -3,6 +3,7 @@ import authRoutes from '../modules/auth/auth.routes';
 import notificationRoutes from '../modules/notifications/notifications.routes';
 import allocationRoutes from '../modules/allocations/allocations.routes';
 import transferRoutes from '../modules/allocations/transfers.routes';
+import bookingRoutes from '../modules/bookings/bookings.routes';
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.use('/auth', authRoutes);
 // router.use('/assets',        assetRoutes);
 router.use('/allocations',   allocationRoutes);
 router.use('/transfers',     transferRoutes);
-// router.use('/bookings',      bookingRoutes);
+router.use('/bookings',      bookingRoutes);
 // router.use('/maintenance',   maintenanceRoutes);
 // router.use('/audits',        auditRoutes);
 router.use('/notifications', notificationRoutes);
