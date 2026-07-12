@@ -18,9 +18,7 @@ export const UpdateDepartmentSchema = z.object({
 
 export const UpdateDepartmentStatusSchema = z.object({
   body: z.object({
-    status: z.enum(['ACTIVE', 'INACTIVE'], {
-      errorMap: () => ({ message: "Status must be 'ACTIVE' or 'INACTIVE'" }),
-    }),
+    status: z.enum(['ACTIVE', 'INACTIVE']),
   }),
 });
 
