@@ -23,13 +23,13 @@ export class DashboardService {
         },
       };
 
-      maintenanceWhere.raisedByUserId = user.id;
+      maintenanceWhere.raisedById = user.id;
       maintenanceWhere.createdAt = { gte: today, lt: tomorrow };
 
-      bookingWhere.bookedByUserId = user.id;
+      bookingWhere.bookedById = user.id;
       bookingWhere.status = 'ONGOING';
 
-      transferWhere.requestedByUserId = user.id;
+      transferWhere.requestedById = user.id;
       transferWhere.status = 'REQUESTED';
 
       returnWhere.allocatedToUserId = user.id;
@@ -59,8 +59,8 @@ export class DashboardService {
       bookingWhere.status = 'ONGOING';
 
       transferWhere.OR = [
-        { requestedByUser: { departmentId: user.departmentId } },
-        { toDepartmentId: user.departmentId },
+        { requestedBy: { departmentId: user.departmentId } },
+        { requestedToDepartmentId: user.departmentId },
       ];
       transferWhere.status = 'REQUESTED';
 
@@ -128,8 +128,8 @@ export class DashboardService {
 
     if (user.role === 'EMPLOYEE') {
       returnWhere.allocatedToUserId = user.id;
-      bookingWhere.bookedByUserId = user.id;
-      maintenanceWhere.raisedByUserId = user.id;
+      bookingWhere.bookedById = user.id;
+      maintenanceWhere.raisedById = user.id;
     } else if (user.role === 'DEPARTMENT_HEAD') {
       if (!user.departmentId) {
         throw new ApiError(400, 'Department head user is not assigned to a department');

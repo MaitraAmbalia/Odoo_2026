@@ -233,7 +233,7 @@ export const Bookings: React.FC = () => {
                 </div>
 
                 {/* Confirmed bookings mapping */}
-                {!loadingBookings && bookings?.map((b: any) => (
+                {!loadingBookings && activeBookings.map((b: any) => (
                   <div
                     key={b.id}
                     style={{

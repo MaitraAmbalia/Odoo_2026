@@ -31,7 +31,7 @@ export const RescheduleBookingSchema = z.object({
 export const CancelBookingSchema = z.object({
   body: z.object({
     cancelReason: z.string().optional(),
-  }),
+  }).default({}),
 });
 
 export const BookingParamsSchema = z.object({
