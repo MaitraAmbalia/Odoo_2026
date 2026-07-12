@@ -8,6 +8,8 @@ import transferRoutes from '../modules/allocations/transfers.routes';
 import bookingRoutes from '../modules/bookings/bookings.routes';
 import maintenanceRoutes from '../modules/maintenance/maintenance.routes';
 import assetsRoutes from '../modules/assets/assets.routes';
+import auditsRoutes from '../modules/audits/audits.routes';
+import reportRoutes from '../modules/reports/reports.routes';
 
 import employeesRoutes from '../modules/employees/employees.routes';
 
@@ -25,10 +27,10 @@ router.use('/allocations',   allocationRoutes);
 router.use('/transfers',     transferRoutes);
 router.use('/bookings',      bookingRoutes);
 router.use('/maintenance',   maintenanceRoutes);
-// router.use('/audits',        auditRoutes);
+router.use('/audits',        auditsRoutes);
 // router.use('/activity-logs', activityLogRoutes);
 // router.use('/dashboard',     dashboardRoutes);
-// router.use('/reports',       reportRoutes);
+router.use('/reports',       reportRoutes);
 
 // Health check
 router.get('/health', (_req, res) => {
