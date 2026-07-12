@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const CreateAllocationSchema = z.object({
   body: z.object({
     assetId: z.string().uuid('Invalid assetId format'),
-    allocatedToUserId: z.string().uuid('Invalid allocatedToUserId format').optional(),
+    allocatedToUserId: z.string().uuid('Invalid allocatedToUserId format  ').optional(),
     allocatedToDepartmentId: z.string().uuid('Invalid allocatedToDepartmentId format').optional(),
     expectedReturnDate: z.preprocess((val: any) => {
       if (typeof val === 'string' && val.trim() === '') return undefined;

@@ -10,7 +10,7 @@ export const CreateAuditCycleSchema = z.object({
     endDate: z.coerce.date(),
     auditorUserIds: z.array(z.string().uuid('Invalid auditor user ID')).min(1, 'At least one auditor must be assigned'),
   }).refine(
-    (data) => data.endDate > data.startDate,
+    (data: any) => data.endDate > data.startDate,
     {
       message: 'endDate must be after startDate',
       path: ['endDate'],
