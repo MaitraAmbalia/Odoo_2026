@@ -31,7 +31,7 @@ export const CreateAssetSchema = z.object({
         }
       }
       return val;
-    }, z.record(z.any()).optional().nullable()),
+    }, z.record(z.string(), z.any()).optional().nullable()),
   }),
 });
 
@@ -66,7 +66,7 @@ export const UpdateAssetSchema = z.object({
         }
       }
       return val;
-    }, z.record(z.any()).optional().nullable()),
+    }, z.record(z.string(), z.any()).optional().nullable()),
   }),
 });
 
