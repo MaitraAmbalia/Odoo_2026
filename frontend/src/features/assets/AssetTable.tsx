@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAssets } from '../../hooks/useAssets';
 import { StatusBadge } from '../../components/shared/StatusBadge';
 import { AssetDrawer } from './AssetDrawer';
@@ -9,11 +10,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Plus, Search } from 'lucide-react';
 
 export const AssetTable: React.FC = () => {
+  const location = useLocation();
+  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const { data, isLoading } = useAssets({ search, status: statusFilter !== 'ALL' ? statusFilter : undefined });
+  useEffect(() => {
+    if (location.state?.openRegister) {
+      setIsDrawerOpen(true);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  // Debounce search: only update query after 300ms of no typing
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(searchInput), 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const { data, isLoading } = useAssets({ search: search || undefined, status: statusFilter !== 'ALL' ? statusFilter : undefined });
 
   return (
     <div className="space-y-6">
@@ -30,8 +46,8 @@ export const AssetTable: React.FC = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input 
             placeholder="Search by tag, name, or serial..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="pl-9 bg-background border-border w-full max-w-sm"
           />
         </div>
@@ -72,7 +88,7 @@ export const AssetTable: React.FC = () => {
                   <div className="flex flex-col items-center">
                     <Package className="w-10 h-10 text-muted-foreground mb-3" />
                     <p className="text-foreground font-medium">No assets match your filters</p>
-                    <Button variant="link" onClick={() => { setSearch(''); setStatusFilter('ALL'); }} className="text-primary mt-2">
+                    <Button variant="link" onClick={() => { setSearchInput(''); setSearch(''); setStatusFilter('ALL'); }} className="text-primary mt-2">
                       Clear filters
                     </Button>
                   </div>

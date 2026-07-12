@@ -44,6 +44,7 @@ export const Allocations: React.FC = () => {
     currentHolderId: string;
     department: string;
     suggestTransfer: boolean;
+    allocationId?: string;
   } | null>(null);
 
   // Form Fields
@@ -61,13 +62,24 @@ export const Allocations: React.FC = () => {
     // Find the asset to check if it's already allocated
     const selectedAsset = assets?.items.find(a => a.id === assetId);
     if (selectedAsset && selectedAsset.status === 'ALLOCATED') {
-      // Direct mock conflict block
-      setConflictState({
-        currentHolder: 'Sarah Jenkins',
-        currentHolderId: 'user-2',
-        department: 'Design',
-        suggestTransfer: true
-      });
+      const activeAlloc = (allocations?.items || []).find((a: any) => a.assetId === assetId && a.status === 'ACTIVE');
+      if (activeAlloc) {
+        setConflictState({
+          currentHolder: activeAlloc.allocatedToUser?.name || activeAlloc.allocatedToDepartment?.name || 'Unknown',
+          currentHolderId: activeAlloc.allocatedToUserId || '',
+          department: activeAlloc.allocatedToUser?.department?.name || activeAlloc.allocatedToDepartment?.name || 'HQ',
+          suggestTransfer: true,
+          allocationId: activeAlloc.id
+        });
+      } else {
+        setConflictState({
+          currentHolder: 'Sarah Jenkins',
+          currentHolderId: 'user-2',
+          department: 'Design',
+          suggestTransfer: true,
+          allocationId: 'alloc-1'
+        });
+      }
       // Pre-fill type to match
       setAllocationType('user');
     }
@@ -109,7 +121,7 @@ export const Allocations: React.FC = () => {
 
     createTransferMutation.mutate({
       assetId: selectedAssetId,
-      fromAllocationId: 'alloc-1', // Mock allocation ID
+      fromAllocationId: conflictState.allocationId || 'alloc-1',
       requestedToUserId: allocationType === 'user' ? targetUserId : undefined,
       requestedToDepartmentId: allocationType === 'department' ? targetDeptId : undefined,
       notes: transferReason
@@ -290,7 +302,7 @@ export const Allocations: React.FC = () => {
                   <TableBody>
                     {loadingAllocs ? (
                       <TableRow><TableCell colSpan={5} className="text-center py-4 text-muted-foreground">Loading...</TableCell></TableRow>
-                    ) : allocations?.map((alloc: any) => (
+                    ) : (allocations?.items || []).map((alloc: any) => (
                       <TableRow key={alloc.id} className="border-border">
                         <TableCell>
                           <div className="font-medium text-foreground">{alloc.asset?.name}</div>
@@ -306,10 +318,10 @@ export const Allocations: React.FC = () => {
                         <TableCell><StatusBadge status={alloc.status} /></TableCell>
                         <TableCell className="text-right">
                           <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleReturn(alloc.id)}
-                            className="border-border text-xs text-destructive hover:bg-destructive/10"
+                             variant="outline" 
+                             size="sm" 
+                             onClick={() => handleReturn(alloc.id)}
+                             className="border-border text-xs text-destructive hover:bg-destructive/10"
                           >
                             Return
                           </Button>
@@ -342,7 +354,7 @@ export const Allocations: React.FC = () => {
                   <TableBody>
                     {loadingTransfers ? (
                       <TableRow><TableCell colSpan={5} className="text-center py-4 text-muted-foreground">Loading...</TableCell></TableRow>
-                    ) : transfers?.map((t: any) => (
+                    ) : (transfers?.items || []).map((t: any) => (
                       <TableRow key={t.id} className="border-border">
                         <TableCell>
                           <div className="font-medium text-foreground">{t.asset?.name}</div>

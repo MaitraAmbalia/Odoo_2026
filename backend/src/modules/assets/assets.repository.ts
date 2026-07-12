@@ -32,6 +32,7 @@ export class AssetsRepository {
   }
 
   async count(filters?: {
+    search?: string;
     tag?: string;
     serial?: string;
     category?: string;
@@ -45,6 +46,7 @@ export class AssetsRepository {
 
   async findAll(
     filters: {
+      search?: string;
       tag?: string;
       serial?: string;
       category?: string;
@@ -221,6 +223,7 @@ export class AssetsRepository {
   }
 
   private buildWhereClause(filters?: {
+    search?: string;
     tag?: string;
     serial?: string;
     category?: string;
@@ -229,36 +232,53 @@ export class AssetsRepository {
     location?: string;
   }) {
     const where: Prisma.AssetWhereInput = {};
+    const andClauses: Prisma.AssetWhereInput[] = [];
 
     if (filters) {
+      // Full-text search across tag, name, serial
+      if (filters.search) {
+        andClauses.push({
+          OR: [
+            { assetTag: { contains: filters.search, mode: 'insensitive' } },
+            { name: { contains: filters.search, mode: 'insensitive' } },
+            { serialNumber: { contains: filters.search, mode: 'insensitive' } },
+          ],
+        });
+      }
       if (filters.tag) {
-        where.assetTag = { contains: filters.tag, mode: 'insensitive' };
+        andClauses.push({ assetTag: { contains: filters.tag, mode: 'insensitive' } });
       }
       if (filters.serial) {
-        where.serialNumber = { contains: filters.serial, mode: 'insensitive' };
+        andClauses.push({ serialNumber: { contains: filters.serial, mode: 'insensitive' } });
       }
       if (filters.category) {
-        // category filter could be name or ID, we support name contains or ID match
-        where.OR = [
-          { categoryId: filters.category },
-          { category: { name: { contains: filters.category, mode: 'insensitive' } } },
-        ];
+        andClauses.push({
+          OR: [
+            { categoryId: filters.category },
+            { category: { name: { contains: filters.category, mode: 'insensitive' } } },
+          ],
+        });
       }
       if (filters.status) {
-        where.status = filters.status;
+        andClauses.push({ status: filters.status });
       }
       if (filters.location) {
-        where.location = { contains: filters.location, mode: 'insensitive' };
+        andClauses.push({ location: { contains: filters.location, mode: 'insensitive' } });
       }
       if (filters.department) {
-        // Asset has department through active allocation
-        where.allocations = {
-          some: {
-            allocatedToDepartmentId: filters.department,
-            status: 'ACTIVE',
+        andClauses.push({
+          allocations: {
+            some: {
+              allocatedToDepartmentId: filters.department,
+              status: 'ACTIVE',
+            },
           },
-        };
+        });
       }
+    }
+
+    if (andClauses.length > 0) {
+      where.AND = andClauses;
     }
 
     return where;

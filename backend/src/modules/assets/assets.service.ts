@@ -257,6 +257,7 @@ export class AssetsService {
   }
 
   async getAll(query: {
+    search?: string;
     tag?: string;
     serial?: string;
     category?: string;

@@ -48,14 +48,14 @@ export const OrgSetup: React.FC = () => {
 
   const [catName, setCatName] = useState('');
   const [catDesc, setCatDesc] = useState('');
-  const [customFields, setCustomFields] = useState<{ key: string; type: string; label: string }[]>([]);
+  const [customFields, setCustomFields] = useState<{ key: string; type: string; label: string; required: boolean }[]>([]);
 
   const handleAddDept = () => {
-    if (!deptName) return;
+    if (!deptName.trim()) return;
     createDeptMutation.mutate({
       name: deptName,
-      parentDepartmentId: deptParent === 'none' ? null : deptParent,
-      headUserId: deptHead === 'none' ? null : deptHead
+      parentDepartmentId: (deptParent === 'none' || !deptParent) ? undefined : deptParent,
+      headUserId: (deptHead === 'none' || !deptHead) ? undefined : deptHead
     }, {
       onSuccess: () => {
         toast({ title: 'Success', description: 'Department created successfully' });
@@ -63,16 +63,19 @@ export const OrgSetup: React.FC = () => {
         setDeptName('');
         setDeptParent(null);
         setDeptHead(null);
+      },
+      onError: (err: any) => {
+        toast({ title: 'Error', description: err?.response?.data?.message || 'Failed to create department', variant: 'destructive' });
       }
     });
   };
 
   const handleAddCat = () => {
-    if (!catName) return;
+    if (!catName.trim()) return;
     createCatMutation.mutate({
       name: catName,
-      description: catDesc,
-      customFieldsSchema: customFields
+      description: catDesc || undefined,
+      customFieldsSchema: customFields.length > 0 ? customFields : undefined
     }, {
       onSuccess: () => {
         toast({ title: 'Success', description: 'Category created successfully' });
@@ -80,6 +83,9 @@ export const OrgSetup: React.FC = () => {
         setCatName('');
         setCatDesc('');
         setCustomFields([]);
+      },
+      onError: (err: any) => {
+        toast({ title: 'Error', description: err?.response?.data?.message || 'Failed to create category', variant: 'destructive' });
       }
     });
   };
@@ -94,15 +100,18 @@ export const OrgSetup: React.FC = () => {
         toast({ title: 'Success', description: 'Employee promoted successfully' });
         setIsPromoteDialogOpen(false);
         setSelectedEmployeeId(null);
+      },
+      onError: (err: any) => {
+        toast({ title: 'Error', description: err?.response?.data?.message || 'Failed to promote employee', variant: 'destructive' });
       }
     });
   };
 
   const addCustomField = () => {
-    setCustomFields([...customFields, { key: `field_${Date.now()}`, type: 'text', label: '' }]);
+    setCustomFields([...customFields, { key: `field_${Date.now()}`, type: 'text', label: '', required: false }]);
   };
 
-  const updateCustomField = (index: number, field: string, value: string) => {
+  const updateCustomField = (index: number, field: string, value: any) => {
     const updated = [...customFields];
     updated[index] = { ...updated[index], [field]: value };
     // Auto-generate key if label changes
@@ -340,7 +349,7 @@ export const OrgSetup: React.FC = () => {
               {customFields.length === 0 && (
                 <p className="text-xs text-muted-foreground text-center py-4">No custom fields added yet.</p>
               )}
-              {customFields.map((field, idx) => (
+               {customFields.map((field, idx) => (
                 <div key={idx} className="flex gap-2 items-center mb-2">
                   <Input 
                     value={field.label} 
@@ -356,8 +365,18 @@ export const OrgSetup: React.FC = () => {
                       <SelectItem value="text">Text</SelectItem>
                       <SelectItem value="number">Number</SelectItem>
                       <SelectItem value="date">Date</SelectItem>
+                      <SelectItem value="boolean">Boolean</SelectItem>
                     </SelectContent>
                   </Select>
+                  <label className="flex items-center gap-1 text-[10px] text-muted-foreground whitespace-nowrap cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={field.required} 
+                      onChange={(e) => updateCustomField(idx, 'required', e.target.checked)}
+                      className="accent-primary rounded"
+                    />
+                    Required
+                  </label>
                   <Button variant="ghost" size="sm" onClick={() => removeCustomField(idx)} className="text-destructive hover:bg-destructive/10">✕</Button>
                 </div>
               ))}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -19,7 +19,13 @@ export const Bookings: React.FC = () => {
   // Filter bookable assets
   const bookableAssets = assets?.items.filter(a => a.isBookable) || [];
   
-  const [selectedAssetId, setSelectedAssetId] = useState<string>(bookableAssets[0]?.id || '1');
+  const [selectedAssetId, setSelectedAssetId] = useState<string>('');
+
+  useEffect(() => {
+    if (bookableAssets.length > 0 && !selectedAssetId) {
+      setSelectedAssetId(bookableAssets[0].id);
+    }
+  }, [bookableAssets, selectedAssetId]);
   const { data: bookings, isLoading: loadingBookings } = useBookings(selectedAssetId);
 
   const createBookingMutation = useCreateBooking();
@@ -82,7 +88,11 @@ export const Bookings: React.FC = () => {
   const handleCancel = (id: string) => {
     cancelBookingMutation.mutate({ id, assetId: selectedAssetId }, {
       onSuccess: () => {
-        toast({ title: 'Success', description: 'Booking cancelled' });
+        toast({ title: 'Success', description: 'Booking cancelled successfully' });
+      },
+      onError: (err: any) => {
+        const msg = err.response?.data?.message || 'Failed to cancel booking';
+        toast({ title: 'Error', description: msg, variant: 'destructive' });
       }
     });
   };
@@ -131,6 +141,8 @@ export const Bookings: React.FC = () => {
     return `${Math.max(5, Math.min(100, percentage))}%`;
   };
 
+  const activeBookings = bookings?.filter((b: any) => b.status !== 'CANCELLED') || [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -168,10 +180,10 @@ export const Bookings: React.FC = () => {
             <CardContent className="space-y-3">
               {loadingBookings ? (
                 <p className="text-xs text-muted-foreground">Loading...</p>
-              ) : bookings?.length === 0 ? (
+              ) : activeBookings.length === 0 ? (
                 <p className="text-xs text-muted-foreground">No bookings scheduled today.</p>
               ) : (
-                bookings?.map((b: any) => (
+                activeBookings.map((b: any) => (
                   <div key={b.id} className="p-3 rounded-lg bg-background border border-border flex items-start justify-between">
                     <div className="space-y-1">
                       <div className="text-xs font-semibold text-foreground">

@@ -1,12 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../api/client';
 
+interface PaginatedData {
+  items: any[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export const useAllocations = () => {
   return useQuery({
     queryKey: ['allocations'],
-    queryFn: async () => {
+    queryFn: async (): Promise<PaginatedData> => {
       const res = await apiClient.get('/allocations');
-      return res.data.data;
+      const data = res.data.data;
+      return { items: data.items || [], total: data.total || 0, page: data.page || 1, limit: data.limit || 20, totalPages: data.totalPages || 1 };
     }
   });
 };
@@ -55,9 +64,10 @@ export const useCreateTransferRequest = () => {
 export const useTransfers = () => {
   return useQuery({
     queryKey: ['transfers'],
-    queryFn: async () => {
+    queryFn: async (): Promise<PaginatedData> => {
       const res = await apiClient.get('/transfers');
-      return res.data.data;
+      const data = res.data.data;
+      return { items: data.items || [], total: data.total || 0, page: data.page || 1, limit: data.limit || 20, totalPages: data.totalPages || 1 };
     }
   });
 };
