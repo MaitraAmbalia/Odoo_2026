@@ -4,38 +4,54 @@ import { Button } from '../../components/ui/button';
 import { useReportsData } from '../../hooks/useReports';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Download, Loader2, ArrowUpRight, ArrowDownRight, TrendingUp, Clock } from 'lucide-react';
-import Papa from 'papaparse';
 import { useToast } from '../../hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { apiClient } from '../../api/client';
 
 export const Reports: React.FC = () => {
   const { toast } = useToast();
   const { data, isLoading } = useReportsData();
   const [isExporting, setIsExporting] = useState(false);
+  const [reportType, setReportType] = useState<string>('utilization');
 
-  const handleExport = () => {
-    if (!data) return;
+  const reportOptions = [
+    { value: 'utilization', label: 'Asset Utilization' },
+    { value: 'maintenance-frequency', label: 'Maintenance Frequency' },
+    { value: 'due-for-maintenance', label: 'Due for Maintenance' },
+    { value: 'department-allocation-summary', label: 'Dept Allocation Summary' },
+    { value: 'booking-heatmap', label: 'Booking Heatmap' }
+  ];
+
+  const handleExport = async () => {
     setIsExporting(true);
+    try {
+      const response = await apiClient.get('/reports/export', {
+        params: {
+          type: reportType,
+          format: 'csv'
+        },
+        responseType: 'blob'
+      });
 
-    setTimeout(() => {
-      // Create CSV structure
-      const csvData = data.utilization.map((item: any) => ({
-        Department: item.department,
-        'Utilization Rate (%)': item.rate
-      }));
-
-      const csv = Papa.unparse(csvData);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `AssetFlow_Utilization_Report_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `AssetFlow_${reportType}_Report_${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
-      toast({ title: 'Export Complete', description: 'CSV file downloaded successfully.' });
+      toast({ title: 'Export Complete', description: `${reportOptions.find(o => o.value === reportType)?.label} CSV downloaded successfully.` });
+    } catch (err: any) {
+      toast({
+        title: 'Export Failed',
+        description: err.response?.data?.message || err.message || 'Failed to export report',
+        variant: 'destructive'
+      });
+    } finally {
       setIsExporting(false);
-    }, 1500); // Spinner mock
+    }
   };
 
   if (isLoading) {
@@ -44,22 +60,34 @@ export const Reports: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-foreground">Reports & Analytics</h1>
           <p className="text-xs text-muted-foreground mt-1">Export organizational insights and audit history.</p>
         </div>
-        <Button onClick={handleExport} className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isExporting}>
-          {isExporting ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Exporting...
-            </>
-          ) : (
-            <>
-              <Download className="w-4 h-4 mr-2" /> Export Report
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-3">
+          <Select value={reportType} onValueChange={setReportType}>
+            <SelectTrigger className="bg-background border-border w-[220px]">
+              <SelectValue placeholder="Select Report Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {reportOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button onClick={handleExport} className="bg-primary hover:bg-primary/90 text-primary-foreground shrink-0" disabled={isExporting}>
+            {isExporting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Exporting...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 mr-2" /> Export
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Main Charts Row */}

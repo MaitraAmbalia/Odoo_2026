@@ -78,6 +78,7 @@ export const UpdateAssetStatusSchema = z.object({
 
 export const ListAssetsQuerySchema = z.object({
   query: z.object({
+    search: z.string().optional(),
     tag: z.string().optional(),
     serial: z.string().optional(),
     category: z.string().optional(),

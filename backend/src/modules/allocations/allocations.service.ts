@@ -158,15 +158,16 @@ export class AllocationsService {
       throw new ApiError(400, 'Allocation is not active or overdue, cannot request transfer');
     }
 
-    // Access check: Only holder can request transfer
+    // Access check: holder, dept head of holder's dept, ADMIN, or ASSET_MANAGER
+    const isManager = caller.role === 'ADMIN' || caller.role === 'ASSET_MANAGER';
     const isUserHolder = allocation.allocatedToUserId === caller.id;
     const isDeptHeadHolder =
       allocation.allocatedToDepartmentId &&
       caller.role === 'DEPARTMENT_HEAD' &&
       allocation.allocatedToDepartment?.headUserId === caller.id;
 
-    if (!isUserHolder && !isDeptHeadHolder) {
-      throw new ApiError(403, 'Only the current holder of the allocation can request a transfer');
+    if (!isManager && !isUserHolder && !isDeptHeadHolder) {
+      throw new ApiError(403, 'Only the current holder, their Department Head, or an Asset Manager can request a transfer');
     }
 
     // Verify recipient existence
