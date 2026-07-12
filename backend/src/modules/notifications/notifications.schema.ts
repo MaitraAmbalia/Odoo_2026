@@ -4,7 +4,7 @@ import { paginationSchema } from '../../common/pagination';
 export const GetNotificationsQuerySchema = z.object({
   query: paginationSchema.extend({
     unreadOnly: z
-      .preprocess((val) => {
+      .preprocess((val: any) => {
         if (val === 'true') return true;
         if (val === 'false') return false;
         return undefined;
