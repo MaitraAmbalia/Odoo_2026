@@ -28,8 +28,6 @@
 
 **AssetFlow** is a full-stack enterprise platform that enables organizations to manage their entire physical asset lifecycle — from asset registration and QR tagging through departmental allocation, resource booking, maintenance coordination, audit compliance, and operational reporting — all from a single, real-time dashboard.
 
-The frontend features the **Donezo** design language: a clean forest-green palette with smooth card layouts, rounded corners, and a premium light/dark mode toggle. Every interaction feels polished, responsive, and professional.
-
 ---
 
 ## 📈 ER Diagram
