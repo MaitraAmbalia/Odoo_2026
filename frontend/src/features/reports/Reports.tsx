@@ -18,7 +18,7 @@ export const Reports: React.FC = () => {
 
     setTimeout(() => {
       // Create CSV structure
-      const csvData = data.utilization.map(item => ({
+      const csvData = data.utilization.map((item: any) => ({
         Department: item.department,
         'Utilization Rate (%)': item.rate
       }));
@@ -124,7 +124,7 @@ export const Reports: React.FC = () => {
             <CardDescription className="text-muted-foreground text-xs">Top bookable assets based on total hours reserved.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {data?.mostUsed.map((item, idx) => (
+            {data?.mostUsed.map((item: any, idx: number) => (
               <div key={idx} className="flex justify-between items-center p-3 bg-background border border-border rounded-xl">
                 <div>
                   <div className="text-xs font-semibold text-foreground">{item.name}</div>
@@ -138,7 +138,7 @@ export const Reports: React.FC = () => {
             ))}
           </CardContent>
         </Card>
-
+ 
         {/* Idle Assets */}
         <Card className="bg-surface border-border">
           <CardHeader>
@@ -146,7 +146,7 @@ export const Reports: React.FC = () => {
             <CardDescription className="text-muted-foreground text-xs">Assets marked available without active allocation/booking.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {data?.idle.map((item, idx) => (
+            {data?.idle.map((item: any, idx: number) => (
               <div key={idx} className="flex justify-between items-center p-3 bg-background border border-border rounded-xl">
                 <div>
                   <div className="text-xs font-semibold text-foreground">{item.name}</div>

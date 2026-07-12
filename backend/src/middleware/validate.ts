@@ -13,11 +13,20 @@ import { ApiError } from '../common/ApiError';
 export const validate = (schema: z.ZodTypeAny) => {
   return (req: Request, _res: Response, next: NextFunction): void => {
     try {
-      schema.parse({
+      const parsed = schema.parse({
         body: req.body,
         query: req.query,
         params: req.params,
       });
+      if (parsed.body !== undefined) {
+        Object.defineProperty(req, 'body', { value: parsed.body, writable: true, configurable: true, enumerable: true });
+      }
+      if (parsed.query !== undefined) {
+        Object.defineProperty(req, 'query', { value: parsed.query, writable: true, configurable: true, enumerable: true });
+      }
+      if (parsed.params !== undefined) {
+        Object.defineProperty(req, 'params', { value: parsed.params, writable: true, configurable: true, enumerable: true });
+      }
       next();
     } catch (err) {
       const anyErr = err as any;

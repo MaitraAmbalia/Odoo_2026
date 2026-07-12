@@ -171,7 +171,7 @@ export const Bookings: React.FC = () => {
               ) : bookings?.length === 0 ? (
                 <p className="text-xs text-muted-foreground">No bookings scheduled today.</p>
               ) : (
-                bookings?.map((b) => (
+                bookings?.map((b: any) => (
                   <div key={b.id} className="p-3 rounded-lg bg-background border border-border flex items-start justify-between">
                     <div className="space-y-1">
                       <div className="text-xs font-semibold text-foreground">
@@ -221,7 +221,7 @@ export const Bookings: React.FC = () => {
                 </div>
 
                 {/* Confirmed bookings mapping */}
-                {!loadingBookings && bookings?.map((b) => (
+                {!loadingBookings && bookings?.map((b: any) => (
                   <div
                     key={b.id}
                     style={{
