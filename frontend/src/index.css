@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 7%;
+    --surface: 0 0% 11%;
+    --surface-raised: 0 0% 15%;
+    --border: 0 0% 22%;
+    --foreground: 0 0% 95%;
+    --muted-foreground: 0 0% 60%;
+
+    --primary: 152 55% 30%;
+    --primary-foreground: 0 0% 98%;
+
+    --destructive: 358 55% 45%;
+    --destructive-foreground: 0 0% 98%;
+
+    --warning: 38 60% 45%;
+    --info: 205 45% 40%;
+    --success: 152 45% 40%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
