@@ -66,44 +66,50 @@ export const Dashboard: React.FC = () => {
 
       {/* 6 Grid Cards (Today's Overview) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {overviewKPIs.map((kpi, idx) => {
-          const isPrimary = kpi.type === 'primary';
-          return (
-            <Card 
-              key={idx} 
-              className={cn(
-                "rounded-2xl p-6 transition-all duration-200 border shadow-sm relative overflow-hidden",
-                isPrimary 
-                  ? "bg-primary text-primary-foreground border-transparent shadow-lg shadow-primary/10" 
-                  : "bg-surface border-border text-foreground hover:border-border/80"
-              )}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <span className={cn(
-                    "text-[10px] font-semibold uppercase tracking-wider",
-                    isPrimary ? "text-primary-foreground/80" : "text-muted-foreground"
+        {kpisLoading ? (
+          Array.from({ length: 6 }).map((_, idx) => (
+            <Card key={idx} className="bg-surface border-border p-6 h-[140px] animate-pulse" />
+          ))
+        ) : (
+          overviewKPIs.map((kpi, idx) => {
+            const isPrimary = kpi.type === 'primary';
+            return (
+              <Card 
+                key={idx} 
+                className={cn(
+                  "rounded-2xl p-6 transition-all duration-200 border shadow-sm relative overflow-hidden",
+                  isPrimary 
+                    ? "bg-gradient-to-br from-[#0e623b] to-[#1b7a4d] dark:from-[#159c5e] dark:to-[#0e623b] text-white border-transparent shadow-lg shadow-primary/10" 
+                    : "bg-surface border-border text-foreground hover:border-border/80"
+                )}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className={cn(
+                      "text-[10px] font-semibold uppercase tracking-wider",
+                      isPrimary ? "text-primary-foreground/80" : "text-muted-foreground"
+                    )}>
+                      {kpi.title}
+                    </span>
+                    <h3 className="text-3xl font-bold mt-2 tracking-tight">{kpi.value}</h3>
+                  </div>
+                  <div className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center text-xs",
+                    isPrimary ? "bg-white/20 text-white" : "bg-surface-raised text-muted-foreground"
                   )}>
-                    {kpi.title}
-                  </span>
-                  <h3 className="text-3xl font-bold mt-2 tracking-tight">{kpi.value}</h3>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </div>
                 </div>
-                <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-xs",
-                  isPrimary ? "bg-white/10 text-primary-foreground" : "bg-surface-raised text-muted-foreground"
+                <p className={cn(
+                  "text-[10px] mt-4 font-medium",
+                  isPrimary ? "text-primary-foreground/80" : "text-muted-foreground"
                 )}>
-                  <ArrowUpRight className="w-4 h-4" />
-                </div>
-              </div>
-              <p className={cn(
-                "text-[10px] mt-4 font-medium",
-                isPrimary ? "text-primary-foreground/80" : "text-muted-foreground"
-              )}>
-                {kpi.description}
-              </p>
-            </Card>
-          );
-        })}
+                  {kpi.description}
+                </p>
+              </Card>
+            );
+          })
+        )}
       </div>
 
       {/* Red Alert Banner: 3 assets overdue for return - flagged for follow-up */}
