@@ -1,0 +1,14 @@
+# IDE / OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+
+# Node modules & builds
+node_modules/
+dist/
+**/node_modules/
+**/dist/
+package-lock.json
+**/package-lock.json
